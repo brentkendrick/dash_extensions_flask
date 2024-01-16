@@ -1,4 +1,4 @@
-dash
+dash[celery]
 dash_extensions
 celery
 redis

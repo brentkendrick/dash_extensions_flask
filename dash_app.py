@@ -1,5 +1,6 @@
 import time
 
+import dash
 from celery import Celery
 from dash import CeleryManager
 from dash_extensions.enrich import (
@@ -19,21 +20,27 @@ from flask_app import create_flask_app
 REDIS_URL = "redis://127.0.0.1:6379/0"
 REDIS_HOST = "127.0.0.1"
 
-celery_app = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
-background_callback_manager = CeleryManager(celery_app)
 
 # *** INSTANTIATE FLASK APP, AND GRAB THE SERVER ***
 server = create_flask_app()
 
 URL_BASE = "/bkgd/"
 
+# *** INSTANTIATE THE PROXY APP WITHOUT BACKGROUND CB MGR ***
 app = DashProxy(
     __name__,
     server=server,
     routes_pathname_prefix=URL_BASE,
-    background_callback_manager=background_callback_manager,
+    # background_callback_manager=background_callback_manager,
     transforms=[ServersideOutputTransform(backends=[RedisBackend(host=REDIS_HOST)])],
 )
+
+celery_app = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
+background_callback_manager = CeleryManager(celery_app)
+
+dash_app = dash.Dash(__name__, background_callback_manager=background_callback_manager)
+app.hijack(dash_app)
+
 
 app.layout = html.Div(
     [
