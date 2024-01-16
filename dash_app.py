@@ -17,6 +17,7 @@ from flask_app import create_flask_app
 # *** INITIALIZE CELERY ***
 
 REDIS_URL = "redis://127.0.0.1:6379/0"
+REDIS_HOST = "127.0.0.1"
 
 celery_app = Celery(__name__, broker=REDIS_URL, backend=REDIS_URL)
 background_callback_manager = CeleryManager(celery_app)
@@ -31,7 +32,7 @@ app = DashProxy(
     server=server,
     routes_pathname_prefix=URL_BASE,
     background_callback_manager=background_callback_manager,
-    transforms=[ServersideOutputTransform(backends=[RedisBackend(host=REDIS_URL)])],
+    transforms=[ServersideOutputTransform(backends=[RedisBackend(host=REDIS_HOST)])],
 )
 
 app.layout = html.Div(
