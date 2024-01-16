@@ -7,8 +7,10 @@ from dash_extensions.enrich import (
     Input,
     Output,
     RedisBackend,
+    Serverside,
     ServersideOutputTransform,
     callback,
+    ctx,
     html,
 )
 
@@ -73,7 +75,8 @@ app.layout = html.Div(
 )
 def update_progress(set_progress, n_clicks):
     total = 5
-    print("\nUpdating progress!!!")
+    print("\n\nUpdating progress!!!\n\n")
+    print(ctx.triggered)  # pressing cancel button doesn't trigger anything
     for i in range(total + 1):
         set_progress((str(i), str(total)))
         time.sleep(1)
